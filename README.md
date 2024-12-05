@@ -11,8 +11,7 @@
 ![image](https://github.com/user-attachments/assets/83fefdcb-a7d5-4e21-9b6c-70fb4967cf87)
 
 ## 서비스 기술 동작 화면
-![image](https://github.com/user-attachments/assets/791941dd-2979-413b-8456-5e2ce43472b8)
-
+![image](https://github.com/user-attachments/assets/df961c8b-da58-4a2c-8a1f-58c06cdb8830)
 
 ## 소프트웨어 사용 방법
 - 소프트웨어 준비 사항 : git@github.com:KETI-A/athena.git 소프트웨어 필요
