@@ -1,0 +1,217 @@
+<!--
+******************************************************************************
+#
+# Copyright (C) 2023 - 2028 KETI, All rights reserved.
+#                           (Korea Electronics Technology Institute)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# Use of the Software is limited solely to applications:
+# (a) running for Korean Government Project, or
+# (b) that interact with KETI project/platform.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# KETI BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+# OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Except as contained in this notice, the name of the KETI shall not be used
+# in advertising or otherwise to promote the sale, use or other dealings in
+# this Software without prior written authorization from KETI.
+#
+******************************************************************************
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Guides</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Inline&display=swap" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div id="map"></div>
+<div id="right-info-background"></div>
+<div id="bottom-info-background"></div>
+
+<div id="weather-info">
+    <img id="weather-icon" src="" alt="Weather Icon"/>
+    <div id="location">Location: --</div>
+    <div id="temperature">Temperature: --°C</div>
+    <div id="humidity">Humidity: --%</div>
+</div>
+
+<div id="pdr-status">
+    <span id="pdr-value">PDR (Packet Delivery Rate): --</span>
+</div>
+<div id="latency-status">
+    <span id="latency-value">Latency (Air to Air): --</span>
+</div>
+
+<div id="graphs">
+    <div id="graph1" class="graph"></div>
+    <div id="graph2" class="graph"></div>
+</div>
+
+<div id="traffic-light">
+    <img id="traffic-light-image" src="https://raw.githubusercontent.com/KETI-A/athena/main/src/apps/html/images/green-light.png" alt="Traffic Light" width="50">
+    <p id="traffic-light-status" style="color: green;">Green Light<br>(GO)</p>
+</div>
+
+<div id="status-table-container">
+    <table id="status-table">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th id="tx-vehicle-header">Tx_Vehicle</th>
+                <th id="rx-vehicle-header">Rx_Vehicle</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Latitude</td>
+                <td id="tx-latitude-value">Latitude</td>
+                <td id="rx-latitude-value">Latitude</td>
+            </tr>
+            <tr>
+                <td>Longitude</td>
+                <td id="tx-longitude-value">Longitude</td>
+                <td id="rx-longitude-value">Longitude</td>
+            </tr>
+            <tr>
+                <td>Attitude</td>
+                <td id="tx-attitude-value">nTxAttitude</td>
+                <td id="rx-attitude-value">nRxAttitude</td>
+            </tr>
+            <tr>
+                <td>SwVerL1</td>
+                <td id="tx-swver1-value">nTxSwVerL1</td>
+                <td id="rx-swver1-value">nRxSwVerL1</td>
+            </tr>
+            <tr>
+                <td>SwVerL2</td>
+                <td id="tx-swver2-value">nTxSwVerL2</td>
+                <td id="rx-swver2-value">nRxSwVerL2</td>
+            </tr>
+            <tr>
+                <td>HwVerL1</td>
+                <td id="tx-hwver1-value">nTxHwVerL1</td>
+                <td id="rx-hwver1-value">nRxHwVerL1</td>
+            </tr>
+            <tr>
+                <td>HwVerL2</td>
+                <td id="tx-hwver2-value">nTxHwVerL2</td>
+                <td id="rx-hwver2-value">nRxHwVerL2</td>
+            </tr>
+            <tr>
+                <td>Distance</td>
+                <td id="distance-value" colspan="2">usCommDistance</td>
+            </tr>
+            <tr>
+                <td>Rssi</td>
+                <td id="nRssi-value" colspan="2">nRssi</td>
+            </tr>
+            <tr>
+                <td>Rcpi</td>
+                <td id="ucRcpi-value" colspan="2">ucRcpi</td>
+            </tr>
+            <tr>
+                <td>eRsvLevel</td>
+                <td id="eRsvLevel-value" colspan="2">eRsvLevel</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<button id="autoTrackButton">AUTO TRACK</button>
+<button id="projectionButton">PROJECTION</button>
+<button id="connectedStatusButton">CONNECTED STATUS</button>
+<button id="workZoneButton">WORK ZONE</button>
+<button id="mrsuButton">M-RSU</button>
+<button id="visiblePathButton">VISIBLE PATH</button>
+<button id="CB1">CB1</button>
+<button id="CB2">CB2</button>
+<button id="CB3">CB3</button>
+<button id="CB4">CB4</button>
+<button id="CB5">CB5</button>
+<button id="CB6">CB6</button>
+<button id="CC1">CC1</button>
+<button id="CC2">CC2</button>
+<button id="CC3">CC3</button>
+<button id="CC4">CC4</button>
+<button id="CC5">CC5</button>
+<button id="CC6">CC6</button>
+<button id="CC7">CC7</button>
+<button id="CD1">CD1</button>
+<button id="CD2">CD2</button>
+<button id="CD3">CD3</button>
+<button id="CD4">CD4</button>
+<button id="CD5">CD5</button>
+<button id="CD6">CD6</button>
+<button id="CD7">CD7</button>
+<button id="CD8">CD8</button>
+
+<div id="modal-background"></div>
+
+<div id="modal">
+    <h2>KETI ATHENA<br>Application Software</h2>
+    <label for="vehType">차량 Type C-VEH(cv), 또는 A-VEH(av)를 입력하세요.</label><br>
+    <input type="text" id="vehType" class="modal-input" placeholder="cv 또는 av"><br>
+    <label for="testType">입력 파일 Type(Tx 또는 Rx)를 입력하세요.</label><br>
+    <input type="text" id="testType" class="modal-input" placeholder="Tx 또는 Rx"><br>
+    <label for="ipAddress">장비 IP 주소를 입력하세요.</label><br>
+    <input type="text" id="ipAddress" class="modal-input" placeholder="기본값: 10.252.110.58"><br>
+    <label for="visiblePath">Visible Path 여부 (Yes 또는 No)를 입력하세요.</label><br>
+    <input type="text" id="visiblePath" class="modal-input" placeholder="기본값: No"><br>
+    <label for="regionSelect">지역을 선택하세요.</label><br>
+    <select id="regionSelect" class="modal-input">
+        <option value="pangyo">판교</option>
+        <option value="daegu">대구</option>
+        <option value="incheon">인천</option>
+    </select><br>
+    <button id="submit-button" class="modal-button">확인</button>
+</div>
+
+<div id="ci-logo">
+    <img src="https://raw.githubusercontent.com/KETI-A/athena/main/src/apps/html/images/keti_ci.png" alt="CI Logo">
+</div>
+<div id="coordinate-popup" style="display: none; position: absolute; padding: 10px; background-color: rgba(0, 0, 0, 0.8); color: white; border-radius: 5px; font-size: 14px; z-index: 10;">
+    <p id="coordinate-text"></p>
+</div>
+
+<div id="compass"></div>
+
+<div id="heading-info">
+    <p id="heading-text">--°</p>
+</div>
+
+<div id="speed-info">
+    <span id="speed-value">--</span> <span id="speed-unit">km/h</span>
+</div>
+
+<div id="datetime-info"></div>
+
+<script src="main.js"></script>
+
+</body>
+</html>

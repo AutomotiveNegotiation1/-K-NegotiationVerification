@@ -1,0 +1,541 @@
+/******************************************************************************
+#
+# Copyright (C) 2023 - 2028 KETI, All rights reserved.
+#                           (Korea Electronics Technology Institute)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# Use of the Software is limited solely to applications:
+# (a) running for Korean Government Project, or
+# (b) that interact with KETI project/platform.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# KETI BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+# OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Except as contained in this notice, the name of the KETI shall not be used
+# in advertising or otherwise to promote the sale, use or other dealings in
+# this Software without prior written authorization from KETI.
+#
+#******************************************************************************/
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 7%;
+    width: 75%;
+    z-index: 1; /* 지도의 z-index 명확하게 설정 */
+}
+
+#right-info-background {
+    position: absolute;
+    top: 0;
+    bottom: 7%;
+    right: 0;
+    width: 25%; /* 남은 25%를 차지하는 배경 설정 */
+    background-color: rgba(0, 0, 0, 0.8); /* 어두운 배경색 */
+    z-index: 1; /* 그래프와 동일한 z-index 설정 */
+}
+
+#bottom-info-background {
+    position: absolute;
+    bottom: 0;
+    height: 7%; /* 전체 높이의 5%를 차지하는 검정 바 */
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* 어두운 배경색 */
+    z-index: 1;
+}
+
+#weather-info {
+    position: absolute;
+    top: 45px;
+    left: 7.5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 11.25px;
+    border-radius: 7.5px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    width: 135px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+#weather-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 7.5px;
+}
+
+#location, #temperature, #humidity {
+    font-size: 13.5px;
+    font-weight: bold;
+    margin-bottom: 3.75px;
+    text-align: center;
+    color: white;
+}
+
+/* 그래프 컨테이너 스타일 */
+#graphs {
+    position: absolute;
+    top: 100px;
+    bottom: 5%;
+    right: 0px;
+    width: 23%; /* 더 좁은 너비로 설정하여 맵과 겹치지 않도록 함 */
+    background-color: rgba(0, 0, 0, 0.7); /* 동일한 어두운 배경 */
+    padding: 15px; /* 내부 여백 추가 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 그림자 효과 */
+    display: flex;
+    flex-direction: column;
+    z-index: 2; /* 맵 위에 그래프가 보이도록 설정 */
+}
+
+/* 개별 그래프 스타일 */
+.graph {
+    flex: 1;
+    position: relative;
+    margin-top: 30px; /* 그래프 간 간격 조정 */
+    margin-left: 10px; /* 왼쪽 여백 추가하여 맵과 겹치지 않도록 설정 */
+    background-color: rgba(0, 0, 0, 0.7); /* 동일한 배경색 */
+    padding: 10px;
+    border-radius: 10px; /* 둥근 모서리 */
+}
+
+/* PDR 상태 정보 스타일 */
+#pdr-status {
+    position: absolute;
+    top: 1px;
+    left: 1950px;
+    background-color: rgba(0, 0, 0, 0.8); /* 약간 투명한 검은색 배경 */
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    font-family: 'Arial', sans-serif;
+    font-size: 20px;
+    color: white;
+    z-index: 2;
+    text-align: left;
+}
+
+/* Latency 상태 정보 스타일 */
+#latency-status {
+    position: absolute;
+    top: 50px; /* PDR 상태 정보 아래 */
+    left: 1950px;
+    background-color: rgba(0, 0, 0, 0.8); /* 약간 투명한 검은색 배경 */
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    font-family: 'Arial', sans-serif;
+    font-size: 20px;
+    color: white;
+    z-index: 2;
+    text-align: right;
+}
+
+#pdr-value {
+    color: #FFD700; /* PDR 문구의 주황색 */
+    font-weight: bold;
+}
+
+#latency-value {
+    color: #FF7F50; /* Latency 문구의 코랄색 */
+    font-weight: bold;
+}
+
+/* 위치, 거리 등 정보 표 */
+#status-table-container {
+    position: absolute;
+    bottom: 150px;
+    left: 20px;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#status-table {
+    width: 450px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+#status-table th {
+    background-color: #444;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #555;
+    font-size: 15px;
+}
+
+#status-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    color: #333;
+}
+
+#status-table td[colspan="2"] {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    color: #333;
+}
+
+#status-table td:hover {
+    background-color: rgba(0, 128, 255, 0.1);
+}
+
+#autoTrackButton, #projectionButton, #connectedStatusButton, #visiblePathButton {
+    position: absolute;
+    padding: 7.5px 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 7.5px;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+}
+
+#autoTrackButton {
+    top: 7.5px;
+    left: 7.5px;
+}
+
+#projectionButton {
+    top: 7.5px;
+    left: 120px;
+}
+
+#connectedStatusButton {
+    top: 7.5px;
+    left: 232.5px;
+}
+
+#visiblePathButton {
+    top: 7.5px;
+    left: 393.75px;
+}
+
+#workZoneButton, #mrsuButton, #CB1, #CB2, #CB3, #CB4, #CB5, #CB6, #CC1, #CC2, #CC3, #CC4, #CC5, #CC6, #CC7, #CD1, #CD2, #CD3, #CD4, #CD5, #CD6, #CD7, #CD8 {
+    position: absolute;
+    padding: 3.75px 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 7.5px;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+}
+
+#workZoneButton {
+    bottom: 11.25px;
+    left: 225px;
+}
+
+#mrsuButton {
+    bottom: 37.5px;
+    left: 225px;
+}
+
+#CB1 {
+    bottom: 37.5px;
+    left: 337.5px;
+}
+
+#CB2 {
+    bottom: 11.25px;
+    left: 337.5px;
+}
+
+#CB3 {
+    bottom: 37.5px;
+    left: 401.25px;
+}
+
+#CB4 {
+    bottom: 11.25px;
+    left: 401.25px;
+}
+
+#CB5 {
+    bottom: 37.5px;
+    left: 465px;
+}
+
+#CB6 {
+    bottom: 11.25px;
+    left: 465px;
+}
+
+#CC1 {
+    bottom: 37.5px;
+    left: 528.75px;
+}
+
+#CC2 {
+    bottom: 11.25px;
+    left: 528.75px;
+}
+
+#CC3 {
+    bottom: 37.5px;
+    left: 592.5px;
+}
+
+#CC4 {
+    bottom: 11.25px;
+    left: 592.5px;
+}
+
+#CC5 {
+    bottom: 37.5px;
+    left: 656.25px;
+}
+
+#CC6 {
+    bottom: 11.25px;
+    left: 656.25px;
+}
+
+#CC7 {
+    bottom: 37.5px;
+    left: 720px;
+}
+
+#CD1 {
+    bottom: 37.5px;
+    left: 783.75px;
+}
+
+#CD2 {
+    bottom: 11.25px;
+    left: 783.75px;
+}
+
+#CD3 {
+    bottom: 37.5px;
+    left: 847.5px;
+}
+
+#CD4 {
+    bottom: 11.25px;
+    left: 847.5px;
+}
+
+#CD5 {
+    bottom: 37.5px;
+    left: 911.25px;
+}
+
+#CD6 {
+    bottom: 11.25px;
+    left: 911.25px;
+}
+
+#CD7 {
+    bottom: 37.5px;
+    left: 975px;
+}
+
+#CD8 {
+    bottom: 11.25px;
+    left: 975px;
+}
+
+#autoTrackButton:hover, #projectionButton:hover, #connectedStatusButton:hover, #workZoneButton:hover, #mrsuButton:hover, #visiblePathButton:hover,
+#CB1:hover, #CB2:hover, #CB3:hover, #CB4:hover, #CB5:hover, #CB6:hover,
+#CC1:hover, #CC2:hover, #CC3:hover, #CC4:hover, #CC5:hover, #CC6:hover, #CC7:hover,
+#CD1:hover, #CD2:hover, #CD3:hover, #CD4:hover, #CD5:hover, #CD6:hover, #CD7:hover, #CD8:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#traffic-light {
+    position: absolute;
+    top: 217.5px;
+    left: 7.5px;
+    z-index: 10;
+    text-align: center;
+    padding: 3.75px;
+    border-radius: 3.75px;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+#traffic-light img {
+    width: 82.5px;
+    height: auto;
+}
+
+#traffic-light-status {
+    font-size: 22.5px;
+    margin-top: 3.75px;
+    font-weight: bold;
+}
+
+#modal-background {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 22.5px;
+    background-color: white;
+    border-radius: 7.5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 12px; /* 기본 글씨 크기를 더 작게 설정 */
+}
+
+#modal h2 {
+    font-size: 20px; /* 제목의 글씨 크기 */
+    line-height: 1.2; /* 줄 간격 */
+    margin-bottom: 15px; /* 아래 여백 */
+}
+
+.modal-input {
+    width: calc(100% - 15px);
+    padding: 7px; /* 입력 필드의 패딩을 약간 줄임 */
+    margin: 7.5px 0;
+    font-size: 12px; /* 입력 필드 내부 글씨 크기를 줄임 */
+    border: 1px solid #ccc;
+    border-radius: 3.75px;
+}
+
+.modal-button {
+    padding: 7.5px 15px; /* 버튼의 패딩을 줄임 */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3.75px;
+    cursor: pointer;
+    font-size: 12px; /* 버튼 글씨 크기를 줄임 */
+}
+
+.modal-button:hover {
+    background-color: #45a049;
+}
+
+#ci-logo {
+    position: absolute;
+    bottom: 0;
+    left: 7.5px;
+    z-index: 2;
+    padding: 3.75px;
+}
+
+#ci-logo img {
+    width: 202.5px;
+    height: auto;
+}
+
+#compass {
+    position: absolute;
+    top: 10px;
+    left: 1370px;
+    width: 100px;
+    height: 100px;
+    background-image: url('https://raw.githubusercontent.com/KETI-A/athena/main/src/apps/html/images/compass.png');
+    background-size: cover;
+    z-index: 1;
+    pointer-events: none;
+    transform-origin: center;
+}
+
+#heading-info {
+    position: absolute;
+    bottom: 80px;
+    left: 1450px;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 2;
+    font-family: 'Bungee Inline', cursive; /* 글씨체를 Bungee Inline으로 설정 */
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+#heading-text {
+    margin: 0;
+    font-weight: bold;
+}
+
+#speed-info {
+    position: absolute;
+    bottom: 78px;
+    left: 1320px;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 2;
+    font-family: 'Bungee Inline', cursive; /* 글씨체를 Bungee Inline으로 설정 */
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+#speed-value {
+    font-size: 36px; /* 속도 값을 더 크게 설정 */
+    margin: 0;
+    font-weight: bold;
+}
+
+#speed-unit {
+    font-size: 20px; /* 단위는 원래 크기로 유지 */
+    margin-left: 5px;
+    margin: 0;
+    font-weight: bold;
+}
+
+#datetime-info {
+    position: absolute;
+    bottom: 10px; /* 아래쪽 여백 */
+    right: 10px; /* 오른쪽 여백 */
+    padding: 10px;
+    color: white; /* 글자 색상 */
+    font-family: 'Arial', sans-serif;
+    font-size: 14px; /* 글자 크기 */
+    border-radius: 5px;
+    z-index: 10; /* 다른 요소들 위에 표시되도록 설정 */
+}
